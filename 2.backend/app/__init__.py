@@ -12,6 +12,18 @@ def create_app():
     db.init_app(app)
     Migrate(app, db)
 
+    from app.models import (
+        user,
+        project,
+        bid,
+        chat_room,
+        chat_room_member,
+        message,
+        milestone,
+        notification,
+        payment,
+    )
+
     from app.routes.main import main
 
     app.register_blueprint(main)

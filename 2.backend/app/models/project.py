@@ -8,13 +8,13 @@ class Project(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
-    budget = db.Column(db.Numeric, (10,2), nullable=False)
+    budget = db.Column(db.Numeric (10,2), nullable=False)
     description = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(30), nullable=False, default="open")
     client_id = db.Column(db.Integer, ForeignKey("users.id"), nullable=False)
     freelancer_id = db.Column(db.Integer, ForeignKey("users.id"), nullable=False)
     selected_bid_id = db.Column(db.Integer, ForeignKey("bids.id"), nullable=True)
-    created_at = db.Column(db.Datetime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     #relationships
     client = relationship("User", foreign_keys=[client_id], backref="client_projects")

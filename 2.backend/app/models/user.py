@@ -17,7 +17,7 @@ class User(db.Model):
     skills = db.Column(JSON)
     profile_pic = db.Column(db.Text, nullable=True)
     rating = db.Column(db.Float)
-    created_at = db.Column(db.Datetime, default = datetime.utcnow)
+    created_at = db.Column(db.DateTime, default = datetime.utcnow)
 
     #relationships
     bids = relationship("Bids", back_populates="freelancer", cascade="all, delete-orphan")

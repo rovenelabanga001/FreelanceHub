@@ -8,10 +8,10 @@ class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     milestone_id = db.Column(db.Integer, ForeignKey("milestones.id"), nullable = False, unique=True)
     payer_id = db.Column(db.Integer, ForeignKey("users.id"), nullable = False)
-    receiver_id = db.Column(db.Integer, ForeignKey("user.id"), nullable = False)
+    receiver_id = db.Column(db.Integer, ForeignKey("users.id"), nullable = False)
     amount = db.Column(db.Numeric(10, 2), nullable = False)
     status = db.Column(db.String(30), nullable = False)
-    created_at = db.Column(db.Datetime, default = db.func.now())
+    created_at = db.Column(db.DateTime, default = db.func.now())
 
     #relationship
     milestone = relationship("Milestone", back_populates="payment", uselist=False)
@@ -22,7 +22,7 @@ class Payment(db.Model):
         CheckConstraint(
             "status IN ('pending', 'processing', 'completed', 'failed', 'refunded', 'partial')",
             name="valid_payment_status_check"
-        )
+        ),
     )
 
     @validates("milestone_id")
