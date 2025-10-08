@@ -1,27 +1,31 @@
 from datetime import date
 from sqlalchemy import CheckConstraint, ForeignKey
 from sqlalchemy.orm import relationship, validates
-from sqlalchemy_serializer import SerializerMixin
 from . import db
 
-class Milestone(db.Model, SerializerMixin):
+class Milestone(db.Model):
     __tablename__ = "milestones"
 
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, ForeignKey("projects.id"), nullable=False)
     title = db.Column(db.String(150), nullable=False)
-    description = db.Column(db.Text)
+    description = db.Column(db.Text, nullable=False)
     amount = db.Column(db.Numeric(10,2), nullable=False)
+    start_date = db.Column(db.Date)
+    completed_date = db.Column(db.Date)
+    approved_date = db.Column(db.Date)
     due_date = db.Column(db.Date)
     status = db.Column(db.String(30), nullable=False, default="pending")
 
+    #relationships
     project = relationship("Project", back_populates="milestones")
+    payment = relationship("Payment", back_populates="milestone", uselist=False, cascade="all, delete-orphan")
 
     __table_args__ = (
         CheckConstraint(
-            "status IN ('pending', 'in_review', 'paid')",
+            "status IN ('pending', 'in_progress', 'submitted', 'approved', 'rejected', 'completed')",
             name="valid_milestone_status_check"
-        )
+        ),
     )
 
     @validates(project_id)

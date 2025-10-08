@@ -1,11 +1,11 @@
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.orm import relationship
 from sqlalchemy import JSON, CheckConstraint
-from sqlalchemy_serializer import SerializerMixin
 from . import db
 
-class User(db.Model, SerializerMixin):
+class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -19,8 +19,24 @@ class User(db.Model, SerializerMixin):
     rating = db.Column(db.Float)
     created_at = db.Column(db.Datetime, default = datetime.utcnow)
 
+    #relationships
+    bids = relationship("Bids", back_populates="freelancer", cascade="all, delete-orphan")
+    
+    payments_made = relationship(
+        "Payment",
+        foreign_keys="Payment.payer_id",
+        back_populates="payer",
+        cascade="all, delete-orphan"
+    )
+    payments_received = relationship(
+        "Payment",
+        foreign_keys="Payment.receiver_id",
+        back_populates="receiver",
+        cascade="all, delete-orphan"
+    )
+
     __table_args__ = (
-        CheckConstraint("role IN ('admin', 'client', 'freelancer')", name="valid_role_check")
+        CheckConstraint("role IN ('admin', 'client', 'freelancer')", name="valid_role_check"),
     )
 
     @property
@@ -33,6 +49,20 @@ class User(db.Model, SerializerMixin):
 
     def verify_password(self, plain_password):
         return check_password_hash(self._password_hash, plain_password)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "role": self.role,
+            "bio": self.bio,
+            "skills": self.skills,
+            "rating": self.rating,
+            "profile_pic": self.profile_pic,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
+        
     
     def __repr__(self):
         return f"<User {self.username}>"
