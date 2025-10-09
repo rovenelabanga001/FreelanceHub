@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import CheckConstraint, ForeignKey, Numeric
 from sqlalchemy.orm import relationship, validates
-from . import db
+from app import db
 
 class Project(db.Model):
     __tablename__ = "projects"
@@ -20,7 +20,7 @@ class Project(db.Model):
     client = relationship("User", foreign_keys=[client_id], backref="client_projects")
     freelancer = relationship("User", foreign_keys=[freelancer_id], backref="freelancer_projects")
     milestones = relationship("Milestone", back_populates="project", cascade="all, delete-orphan")
-    bids = relationship("Bid", back_populates="project", cascade="all, delete-orphan")
+    bids = relationship("Bid", back_populates="project", cascade="all, delete-orphan", foreign_keys="[Bid.project_id]")
 
     __table_args__ = (
         CheckConstraint("status IN ('open', 'in_progress', 'completed', 'cancelled')", name="valid_status_check"),
@@ -63,3 +63,4 @@ class Project(db.Model):
 
     def __repr__(self):
         return f"<Project {self.title} | {self.status}>"
+    

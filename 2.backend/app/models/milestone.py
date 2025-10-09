@@ -1,7 +1,7 @@
 from datetime import date
 from sqlalchemy import CheckConstraint, ForeignKey
 from sqlalchemy.orm import relationship, validates
-from . import db
+from app import db
 
 class Milestone(db.Model):
     __tablename__ = "milestones"

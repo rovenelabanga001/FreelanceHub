@@ -1,6 +1,6 @@
 from sqlalchemy import CheckConstraint, ForeignKey
 from sqlalchemy.orm import relationship, validates
-from . import db
+from app import db
 
 class Payment(db.Model):
     __tablename__ = "payments"
@@ -16,7 +16,7 @@ class Payment(db.Model):
     #relationship
     milestone = relationship("Milestone", back_populates="payment", uselist=False)
     payer = relationship("User", foreign_keys = [payer_id], back_populates="payments_made")
-    reciever = relationship("User",foreign_keys=[receiver_id], back_populates="payments_recieved")
+    receiver = relationship("User",foreign_keys=[receiver_id], back_populates="payments_received")
 
     __table_args__ = (
         CheckConstraint(

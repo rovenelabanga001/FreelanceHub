@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship
 from sqlalchemy import JSON, CheckConstraint
-from . import db
+from app import db
 
 class User(db.Model):
     __tablename__ = "users"
@@ -20,7 +20,7 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default = datetime.utcnow)
 
     #relationships
-    bids = relationship("Bids", back_populates="freelancer", cascade="all, delete-orphan")
+    bids = relationship("Bid", back_populates="freelancer", cascade="all, delete-orphan")
     
     payments_made = relationship(
         "Payment",

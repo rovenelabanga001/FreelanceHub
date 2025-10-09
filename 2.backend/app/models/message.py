@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import ForeignKey, CheckConstraint
 from sqlalchemy.orm import validates, relationship
-from . import db
+from app import db
 
 
 class Message(db.Model):

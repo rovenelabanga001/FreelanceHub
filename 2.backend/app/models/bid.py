@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import CheckConstraint, ForeignKey
 from sqlalchemy.orm import relationship, validates
-from . import db
+from app import db
 from sqlalchemy_serializer import SerializerMixin
 
 class Bid(db.Model, SerializerMixin):
@@ -20,7 +20,7 @@ class Bid(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     #relationships
-    project = relationship("Project", back_populates="bids")
+    project = relationship("Project", back_populates="bids", foreign_keys=[project_id])
     freelancer = relationship("User", back_populates="bids")
 
     __table_args__ = (
@@ -55,3 +55,4 @@ class Bid(db.Model, SerializerMixin):
     
     def __repr__(self):
         return f"<Bid {self.id} - Project {self.project_id} by User {self.user_id}>"
+    

@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import ForeignKey, CheckConstraint
 from sqlalchemy.orm import relationship, validates
-from . import db
+from app import db
 
 class Notification(db.Model):
     __tablename__ = "notifications"
