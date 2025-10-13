@@ -1,7 +1,12 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import { defineNuxtConfig } from "nuxt/config";
+
 export default defineNuxtConfig({
-  compatibilityDate: "2025-07-15",
-  css: ['~/assets/css/global.css'],
-  devtools: { enabled: true },
-  modules: ["@nuxtjs/tailwindcss"],
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.API_BASE || "http://localhost:5000",
+      secretKey: process.env.SECRET_KEY,
+    },
+  },
+  css: ["~/assets/css/global.css"],
+  modules: ["@nuxtjs/tailwindcss", "@pinia/nuxt"],
 });

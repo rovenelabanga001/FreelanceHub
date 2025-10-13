@@ -1,5 +1,4 @@
 from flask import request, jsonify
-from werkzeug.security import check_password_hash
 from app.models.user import User
 from app.utils.jwt_utils import generate_jwt, jwt_required, blacklist_token
 from app.utils.validate_fields import validate_fields
