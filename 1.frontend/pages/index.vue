@@ -8,3 +8,7 @@
     <HomeFooter />
   </div>
 </template>
+<script setup>
+const auth = useAuthStore();
+
+</script>

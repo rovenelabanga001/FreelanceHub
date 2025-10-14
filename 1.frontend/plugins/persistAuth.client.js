@@ -1,4 +1,3 @@
-import { usePinia } from '#imports'
 import CryptoJS from "crypto-js"
 
 export default defineNuxtPlugin(() => {

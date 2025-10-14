@@ -25,30 +25,22 @@ def jwt_required(f):
     """Decorator to protect routes with JWT"""
     @wraps(f)
     def decorated(*args, **kwargs):
-        auth_header = request.headers.get("Authorization")
-        if not auth_header:
-            return jsonify({"error": "Authorization header missing"}), 401
-        
-        #Expect header in format: "Bearer <token>"
-        parts = auth_header.split()
-        if len(parts) != 2 or parts[0].lower() != "bearer":
-            return jsonify({"error" : "Invalid Authorization format"}), 401
-        
-        token = parts[1]
+        token = request.cookies.get("access_token")
+        if not token:
+            return jsonify({"error": "Authentication required"}), 401
 
         if token in blacklisted_tokens:
-            return jsonify({"error": "Token has been blackilisted. Please login again"}), 401
-        
+            return jsonify({"error": "Token has been blacklisted. Please log in again"}), 401
+
         decoded = decode_token(token)
         if "error" in decoded:
             return jsonify(decoded), 401
-        
-        #Attach user to request for access inside views
-        request.user = decoded
-        return f(*args, **kwargs)
-    
-    return decorated
 
+        request.user = decoded
+
+        return f(*args, **kwargs)
+
+    return decorated
 def blacklist_token(token):
     """Add a token to the blacklist (used for logout)."""
     blacklisted_tokens.add(token)

@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, make_response, current_app
 from app.models.user import User
 from app.utils.jwt_utils import generate_jwt, jwt_required, blacklist_token
 from app.utils.validate_fields import validate_fields
@@ -31,11 +31,10 @@ def signup():
     db.session.add(user)
     db.session.commit()
 
-    token = generate_jwt({"id": user.id, "email":user.email, "role": user.role})
+    # token = generate_jwt({"id": user.id, "email":user.email, "role": user.role})
     return jsonify({
         "message": "Signup successful",
         "user": user.to_dict(),
-        "token": token
     }), 201
 
 @user_bp.post("/signin")
@@ -54,11 +53,23 @@ def signin():
         return jsonify({"error": "Invalid email or password"}), 401
     
     token = generate_jwt({"id": user.id, "email": user.email, "role": user.role})
-    return jsonify({
-        "message" : "Login successfull",
-        "user": user.to_dict(),
-        "token": token   
-    }), 200
+    
+    response = make_response(jsonify({
+        "message": "Login Successful",
+        "user": user.to_dict()
+    }))
+
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=False,        # must be False for localhost, True in prod
+        samesite="None",     # needed for cross-origin cookie
+        max_age=60 * 60 * 24,
+        path="/"
+    )
+
+    return response
 
 @user_bp.get("/profile")
 def get_profile():
@@ -68,8 +79,22 @@ def get_profile():
 @user_bp.post("/signout")
 @jwt_required
 def signout():
-    auth_header = request.headers.get("Authorization")
-    token = auth_header.split()[1]
-    blacklist_token(token)
+    token = request.cookies.get("access_token")
+    # if token present, blacklist it
+    if token:
+        try:
+            blacklist_token(token)
+        except Exception:
+            # swallow blacklist errors so logout still succeeds
+            pass
 
-    return jsonify({"message": "Successfully logged out"}), 200
+    # create response and delete cookie (match attributes used when setting cookie)
+    response = make_response(jsonify({"message": "Successfully logged out"}))
+    response.delete_cookie(
+        "access_token",
+        path="/",
+        httponly=True,
+        secure=False,   # True in production with HTTPS
+        samesite="None" # matches how you set it
+    )
+    return response

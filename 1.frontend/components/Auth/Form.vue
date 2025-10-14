@@ -236,6 +236,8 @@ const onSubmit = async () => {
   v$.value.$touch();
   if (props.isSignUp && !v$.value.$invalid) {
     await auth.signup(form);
+  } else if (!props.isSignUp && !v$.value.$invalid) {
+    await auth.signin(form);
   }
 };
 </script>

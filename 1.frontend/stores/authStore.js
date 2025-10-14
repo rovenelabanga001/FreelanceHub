@@ -8,6 +8,10 @@ export const useAuthStore = defineStore("auth", {
     error: null,
   }),
 
+  getters: {
+    isAuthenticated: (state) => !!state.user,
+  },
+
   actions: {
     async signup(payload) {
       const { $toast } = useNuxtApp();
@@ -20,21 +24,22 @@ export const useAuthStore = defineStore("auth", {
           body: payload,
         });
 
-        this.user = res.user;
-        this.token = res.token;
-        localStorage.setItem("token", res.token);
-        localStorage.setItem("user", JSON.stringify(res.user));
-
-        $toast.success("Signup successful!", {
+        $toast.success(res.message || "Signup successful!", {
           position: "bottom-right",
           autoClose: 3000,
         });
 
         navigateTo("/auth/login");
       } catch (err) {
-        this.error = err?.data?.message || "Signup failed";
+        const errorMessage =
+          err?.data?.error ||
+          err?.data?.message ||
+          err?.message ||
+          "Signup failed";
 
-        $toast.error("Signup failed, try again later", {
+        this.error = errorMessage;
+
+        $toast.error(errorMessage, {
           position: "bottom-right",
           autoClose: 3000,
         });
@@ -43,13 +48,91 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
-    restoreSession() {
-      const token = localStorage.getItem("token");
-      const user = localStorage.getItem("user");
+    async signin(payload) {
+      const { $toast } = useNuxtApp();
+      this.loading = true;
+      this.error = null;
 
-      if (token && user) {
-        this.token = token;
-        this.user = JSON.parse(user);
+      try {
+        const res = await $fetch("/api/auth/signin", {
+          method: "POST",
+          body: payload,
+        });
+
+        this.user = res.user;
+
+        $toast.success(res.message || "Login successful!", {
+          position: "bottom-right",
+          autoClose: 3000,
+          theme: "dark",
+        });
+
+        navigateTo("/");
+      } catch (err) {
+        const errorMessage =
+          err?.data?.message || "Login failed. Please try again.";
+
+        this.error = errorMessage;
+
+        $toast.error(errorMessage, {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+
+        console.error("Login error:", err);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async logout() {
+      const { $toast } = useNuxtApp();
+      this.loading = true;
+
+      try {
+        await $fetch("/api/auth/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+
+        this.user = null;
+
+        $toast.success("Successfully logged out!", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+
+        navigateTo("/auth/login", { replace: true });
+      } catch (err) {
+        const errorMessage = err?.data?.message || "Logout failed";
+        $toast.error(errorMessage, {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+        console.log(errorMessage);
+
+        console.error("Logout error:", err);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    restoreSession() {
+      const user = useCookie("auth_user").value;
+      console.log(user);
+
+      if (user) {
+        try {
+          this.user = JSON.parse(user);
+        } catch (err) {
+          console.error("Failed to parse auth_user cookie:", err);
+          this.user = null;
+          useCookie("auth_user").value = null;
+          navigateTo("/auth/login");
+        }
+      } else {
+        this.user = null;
+        navigateTo("/auth/login");
       }
     },
   },
