@@ -64,7 +64,7 @@ def signin():
         value=token,
         httponly=True,
         secure=False,        # must be False for localhost, True in prod
-        samesite="None",     # needed for cross-origin cookie
+        samesite="Lax",     # needed for cross-origin cookie
         max_age=60 * 60 * 24,
         path="/"
     )

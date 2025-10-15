@@ -61,13 +61,13 @@ export const useAuthStore = defineStore("auth", {
 
         this.user = res.user;
 
+        navigateTo("/");
+
         $toast.success(res.message || "Login successful!", {
           position: "bottom-right",
           autoClose: 3000,
           theme: "dark",
         });
-
-        navigateTo("/");
       } catch (err) {
         const errorMessage =
           err?.data?.message || "Login failed. Please try again.";
@@ -97,12 +97,11 @@ export const useAuthStore = defineStore("auth", {
 
         this.user = null;
 
+        navigateTo("/auth/login", { replace: true });
         $toast.success("Successfully logged out!", {
           position: "bottom-right",
           autoClose: 3000,
         });
-
-        navigateTo("/auth/login", { replace: true });
       } catch (err) {
         const errorMessage = err?.data?.message || "Logout failed";
         $toast.error(errorMessage, {

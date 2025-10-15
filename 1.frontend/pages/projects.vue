@@ -3,3 +3,16 @@
     <ProjectsPageHeader />
   </section>
 </template>
+<script setup>
+const { apiFetch } = useApi();
+
+let projects = [];
+
+try {
+  projects = await apiFetch("/projects");
+} catch (err) {
+  console.error("API error:", err);
+}
+
+console.log(projects)
+</script>

@@ -3,6 +3,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
+from app.routes import register_routes
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -35,10 +36,11 @@ def create_app():
     )  
 
     
-    from app.routes.main import main
-    from app.routes.user import user_bp
+    # from app.routes.main import main
+    # from app.routes.user import user_bp
 
-    app.register_blueprint(main)
-    app.register_blueprint(user_bp)
+    # app.register_blueprint(main)
+    # app.register_blueprint(user_bp)
+    register_routes(app)
 
     return app

@@ -7,6 +7,16 @@ export default defineNuxtConfig({
       secretKey: process.env.SECRET_KEY,
     },
   },
+  devServer: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:5000", // backend
+        changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: "localhost", // ensures cookies work
+      },
+    },
+  },
   css: ["~/assets/css/global.css"],
   modules: ["@nuxtjs/tailwindcss", "@pinia/nuxt"],
 });
